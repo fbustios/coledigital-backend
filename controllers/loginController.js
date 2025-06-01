@@ -3,9 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 require('dotenv').config();
 
-exports.showLogin = (req,res) => {
-    res.send('login');
-}
+
 exports.login = (req,res) => {
     const {username, password} = req.body;
     if(!username || !password){
