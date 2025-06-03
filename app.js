@@ -10,7 +10,9 @@ app.use(cors({
 ));
 
 const loginRouter = require('./routes/login/login');
+const adminRouter = require('./routes/adminFunctions/functions');
 app.use(express.json());
 app.use('/login',loginRouter);
+app.use('/adminPage',adminRouter);
 
 app.listen(8080);
