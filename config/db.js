@@ -5,7 +5,7 @@ require('dotenv').config();
 const database = process.env["DB_NAME"];
 
 const connection = mysql2.createConnection({
-    host:'10.100.37.81',
+    host:'192.680.100.16',
     user:'username',
     password:'remoto29072108',
     database:'coledigital',
