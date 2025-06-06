@@ -28,9 +28,12 @@ exports.addStudent = (req,res) => {
 }
 
 exports.deleteFuncionario = (req, res) => {
-    const { cedula } = req.params;
+    const { cedula } = req.body;
 
-    // Primero intentamos eliminar de Estudiante (por si es estudiante)
+    if (!cedula) {
+        return res.status(400).json({ message: "Falta la cédula en el body" });
+    }
+
     const queryDeleteEstudiante = 'DELETE FROM Estudiante WHERE cedula = ?';
     bd.query(queryDeleteEstudiante, [cedula], (err, resultEstudiante) => {
         if (err) {
@@ -38,7 +41,6 @@ exports.deleteFuncionario = (req, res) => {
             return res.status(500).json({ message: 'Error eliminando estudiante' });
         }
 
-        // Luego intentamos eliminar de Profesor (por si es profesor)
         const queryDeleteProfesor = 'DELETE FROM Profesor WHERE cedula = ?';
         bd.query(queryDeleteProfesor, [cedula], (err, resultProfesor) => {
             if (err) {
@@ -46,7 +48,6 @@ exports.deleteFuncionario = (req, res) => {
                 return res.status(500).json({ message: 'Error eliminando profesor' });
             }
 
-            // Finalmente eliminamos de Usuarios
             const queryDeleteUsuario = 'DELETE FROM Usuarios WHERE username = ?';
             bd.query(queryDeleteUsuario, [cedula], (err, resultUsuario) => {
                 if (err) {
@@ -59,3 +60,4 @@ exports.deleteFuncionario = (req, res) => {
         });
     });
 };
+
