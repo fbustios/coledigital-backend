@@ -26,3 +26,36 @@ exports.addStudent = (req,res) => {
 
 
 }
+
+exports.deleteFuncionario = (req, res) => {
+    const { cedula } = req.params;
+
+    // Primero intentamos eliminar de Estudiante (por si es estudiante)
+    const queryDeleteEstudiante = 'DELETE FROM Estudiante WHERE cedula = ?';
+    bd.query(queryDeleteEstudiante, [cedula], (err, resultEstudiante) => {
+        if (err) {
+            console.error('Error eliminando de Estudiante:', err);
+            return res.status(500).json({ message: 'Error eliminando estudiante' });
+        }
+
+        // Luego intentamos eliminar de Profesor (por si es profesor)
+        const queryDeleteProfesor = 'DELETE FROM Profesor WHERE cedula = ?';
+        bd.query(queryDeleteProfesor, [cedula], (err, resultProfesor) => {
+            if (err) {
+                console.error('Error eliminando de Profesor:', err);
+                return res.status(500).json({ message: 'Error eliminando profesor' });
+            }
+
+            // Finalmente eliminamos de Usuarios
+            const queryDeleteUsuario = 'DELETE FROM Usuarios WHERE username = ?';
+            bd.query(queryDeleteUsuario, [cedula], (err, resultUsuario) => {
+                if (err) {
+                    console.error('Error eliminando usuario:', err);
+                    return res.status(500).json({ message: 'Error eliminando usuario' });
+                }
+
+                res.status(200).json({ message: 'Funcionario eliminado correctamente' });
+            });
+        });
+    });
+};

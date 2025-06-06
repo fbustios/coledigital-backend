@@ -6,5 +6,7 @@ const auth = require('../../middlewares/authToken');
 
 
 router.post('/addStudent',auth,adminController.addStudent);
+router.delete('/deleteFuncionario/:cedula', auth, adminController.deleteFuncionario);
+
 
 module.exports = router;
