@@ -22,7 +22,7 @@ exports.login = (req,res) => {
         if(!isMatch){
             return res.status(401).send("Contraseña incorrecta");
         }
-        const token = jwt.sign({id : user.id, rol : user.rol},'perro',{expiresIn: '3h'});
+        const token = jwt.sign({id : user.id, rol : user.rol},'perro',{expiresIn: '1h'});
         res.json({token, user : {id : user.id, username : user.username, rol: user.rol},});
     })
 

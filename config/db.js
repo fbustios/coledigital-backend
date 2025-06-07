@@ -6,10 +6,11 @@ const database = process.env["DB_NAME"];
 
 const connection = mysql2.createConnection({
     host:'6.tcp.ngrok.io',
-    port:'11166',
+    port:'15362',
     user:'username',
     password:'remoto29072108',
     database:'coledigital',
+    multipleStatements : true,
 })
 
 connection.connect((err) => {
