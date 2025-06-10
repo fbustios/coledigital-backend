@@ -10,6 +10,7 @@ router.delete('/deleteFuncionario', auth, adminController.deleteFuncionario);
 router.post('/addProfessor',auth,adminController.addProfessor);
 router.delete('/reset',auth,adminController.reset);
 router.post('/sectionStudent',auth,adminController.addStudentSection);
+router.post('/asignarProfesorClase', adminController.agregarProfesorAClase);
 
 
 module.exports = router;

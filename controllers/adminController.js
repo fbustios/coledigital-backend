@@ -117,3 +117,32 @@ exports.addStudentSection = (req,res) => {
         })
     });
 }
+
+exports.agregarProfesorAClase = (req, res) => {
+    const { cedula, clase_id } = req.body;
+
+    const getProfessorIdQuery = 'SELECT id FROM Profesor WHERE cedula = ?';
+    const insertRelationQuery = 'INSERT INTO ClaseXProfesor (profesor_id, clase_id) VALUES (?, ?)';
+
+    bd.query(getProfessorIdQuery, [cedula], (err, result) => {
+        if (err) {
+            console.error('Error al buscar profesor:', err);
+            return res.status(500).json({ message: 'Error al buscar profesor' });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Profesor no encontrado' });
+        }
+
+        const profesor_id = result[0].id;
+
+        bd.query(insertRelationQuery, [profesor_id, clase_id], (err2, result2) => {
+            if (err2) {
+                console.error('Error al asignar profesor a la clase:', err2);
+                return res.status(500).json({ message: 'Error al asignar profesor a la clase' });
+            }
+
+            res.status(201).json({ message: 'Profesor asignado a la clase' });
+        });
+    });
+};
