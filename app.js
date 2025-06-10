@@ -13,7 +13,9 @@ app.use(cors({
 
 const loginRouter = require('./routes/login/login');
 const adminRouter = require('./routes/adminFunctions/functions');
+const spRouter = require('./routes/studentAndProfessor/routes');
 app.use(express.json());
+app.use('/Home',spRouter);
 app.use('/login',loginRouter);
 app.use('/adminPage',adminRouter);
 
