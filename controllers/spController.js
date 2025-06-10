@@ -3,8 +3,9 @@ const bd = require('../config/db');
 
 exports.getCourses = (req,res) => {
     const {id,rol} = req.body;
+
     if(rol === 'Profesor'){
-        const query = 'SELECT m.id, m.nombre from ClaseXProfesor cx JOIN Clase c on c.id = cx.clase_id JOIN Materia m on c.materia_id = m.id WHERE cx.profesor_id = ?;'
+        const query = 'SELECT c.id, m.nombre from Usuarios u JOIN Profesor p ON u.nombre = p.nombre JOIN ClaseXProfesor cx ON cx.profesor_id = p.id JOIN Clase c on c.id = cx.clase_id JOIN Materia m on c.materia_id = m.id WHERE u.id = ?;'
         bd.query(query,[id],(err,result) => {
             if(err){
                 console.log('me meti')
