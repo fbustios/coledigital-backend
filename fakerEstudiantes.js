@@ -42,4 +42,4 @@ async function insertFakeEstudiantes(cantidad) {
     await connection.end();
 }
 
-insertFakeEstudiantes(50); // Cambiá el número si querés más
+insertFakeEstudiantes(50);

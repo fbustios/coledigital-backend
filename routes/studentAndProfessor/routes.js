@@ -2,6 +2,7 @@ const express = require('express');
 const Router = express.Router();
 const auth = require('../../middlewares/authToken');
 const spController = require('../../controllers/spController');
+const authRol = require('../../middlewares/authRol');
 
 Router.post('/Dashboard',auth,spController.getCourses);
 
