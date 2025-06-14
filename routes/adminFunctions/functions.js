@@ -12,6 +12,8 @@ router.post('/addProfessor',auth, authRole(['Director']),adminController.addProf
 router.delete('/reset',auth,authRole(['Director']),adminController.reset);
 router.post('/sectionStudent',auth,authRole(['Director']),adminController.addStudentSection);
 router.post('/asignarProfesorClase',auth,authRole(['Director']), adminController.agregarProfesorAClase);
+router.put('/editarProfesor',auth,authRole(['Director']), adminController.editarProfesor);
+router.put('/editarEstudiante',auth,authRole(['Director']), adminController.editarEstudiante);
 
 
 module.exports = router;

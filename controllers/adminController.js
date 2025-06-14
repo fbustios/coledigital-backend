@@ -146,3 +146,72 @@ exports.agregarProfesorAClase = (req, res) => {
         });
     });
 };
+
+exports.editarProfesor = (req, res) => {
+    const { cedula, correo, telefono } = req.body;
+
+    if (!cedula) {
+        return res.status(400).json({ message: 'Cédula requerida' });
+    }
+
+    const getQuery = 'SELECT correo, telefono FROM Profesor WHERE cedula = ?';
+    bd.query(getQuery, [cedula], (err, result) => {
+        if (err) {
+            console.error('Error al obtener datos del profesor:', err);
+            return res.status(500).json({ message: 'Error al obtener datos del profesor' });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Profesor no encontrado' });
+        }
+
+        const nuevoCorreo = correo?.trim() || result[0].correo;
+        const nuevoTelefono = telefono?.toString().trim() || result[0].telefono;
+
+        const updateQuery = 'UPDATE Profesor SET correo = ?, telefono = ? WHERE cedula = ?';
+        bd.query(updateQuery, [nuevoCorreo, nuevoTelefono, cedula], (err2) => {
+            if (err2) {
+                console.error('Error al actualizar datos del profesor:', err2);
+                return res.status(500).json({ message: 'Error al actualizar datos del profesor' });
+            }
+
+            res.status(200).json({ message: 'Datos del profesor actualizados correctamente' });
+        });
+    });
+};
+
+exports.editarEstudiante = (req, res) => {
+    const { cedula, correo, telefono } = req.body;
+
+    if (!cedula) {
+        return res.status(400).json({ message: 'Cédula es requerida' });
+    }
+
+    // Primero obtenemos el estudiante
+    const selectQuery = 'SELECT correo, telefono FROM Estudiante WHERE cedula = ?';
+    bd.query(selectQuery, [cedula], (err, result) => {
+        if (err) {
+            console.error('Error al consultar estudiante:', err);
+            return res.status(500).json({ message: 'Error al consultar estudiante' });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Estudiante no encontrado' });
+        }
+
+        const current = result[0];
+
+        const updatedCorreo = correo?.trim() === '' || correo === undefined ? current.correo : correo;
+        const updatedTelefono = telefono?.toString().trim() === '' || telefono === undefined ? current.telefono : telefono;
+
+        const updateQuery = 'UPDATE Estudiante SET correo = ?, telefono = ? WHERE cedula = ?';
+        bd.query(updateQuery, [updatedCorreo, updatedTelefono, cedula], (err2, result2) => {
+            if (err2) {
+                console.error('Error al actualizar estudiante:', err2);
+                return res.status(500).json({ message: 'Error al actualizar datos del estudiante' });
+            }
+
+            res.status(200).json({ message: 'Datos del estudiante actualizados correctamente' });
+        });
+    });
+};
