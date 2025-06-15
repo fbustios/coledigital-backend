@@ -32,3 +32,10 @@ exports.getCourses = (req,res) => {
         });
     }
 }
+
+exports.getStudentId= (req,res) => {
+    const {user_id} = req.body;
+    const query = 'SELECT e.id FROM Usuarios u JOIN Estudiante e ON u.nombre = e.nombre where u.id = ?';
+    //bd.query()
+
+}
