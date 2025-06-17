@@ -70,3 +70,32 @@ exports.getStudentId= (req,res) => {
     //bd.query()
 
 }
+
+exports.agregarMaterialProfesor = (req, res) => {
+    const { link_one_drive, clase_id, semestre_id } = req.body;
+    const user = req.user;
+
+    if (user.rol !== 'Profesor') {
+        return res.status(403).json({ message: 'No autorizado' });
+    }
+
+    const insertLinkQuery = 'INSERT INTO Links (link_one_drive) VALUES (?)';
+    bd.query(insertLinkQuery, [link_one_drive], (err, linkResult) => {
+        if (err) {
+            console.error('Error agregar el link:', err);
+            return res.status(500).json({ message: 'Error al agregar el link' });
+        }
+
+        const link_id = linkResult.insertId;
+
+        const insertMaterialQuery = 'INSERT INTO Material (semestre_id, link_id, clase_id) VALUES (?, ?, ?)';
+        bd.query(insertMaterialQuery, [semestre_id, link_id, clase_id], (err2) => {
+            if (err2) {
+                console.error('Error al agregar el material:', err2);
+                return res.status(500).json({ message: 'Error al agregar el material' });
+            }
+
+            res.status(201).json({ message: 'Material agregado correctamente' });
+        });
+    });
+};

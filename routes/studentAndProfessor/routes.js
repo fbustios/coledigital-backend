@@ -5,6 +5,7 @@ const spController = require('../../controllers/spController');
 const authRol = require('../../middlewares/authRol');
 
 Router.post('/Dashboard',auth,spController.getCourses);
+Router.post('/agregarMaterial', auth, spController.agregarMaterialProfesor);
 
 module.exports = Router;
 
