@@ -5,11 +5,11 @@ require('dotenv').config();
 const database = process.env["DB_NAME"];
 
 const connection = mysql2.createConnection({
-    host:'2.tcp.ngrok.io',
-    port:'13253',
-    user:'username',
-    password:'remoto29072108',
-    database:'coledigital',
+    host: 'localhost',
+    port: '3306', // puerto local por defecto de MySQL
+    user: 'root',
+    password: 'coledigital',
+    database: 'coledigital',
     multipleStatements : true,
 })
 
