@@ -6,10 +6,9 @@ const cors = require('cors');
 
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://192.168.0.93:3000'],
     credentials: true
-}
-));
+}));
 
 const loginRouter = require('./routes/login/login');
 const adminRouter = require('./routes/adminFunctions/functions');
@@ -19,4 +18,5 @@ app.use('/Home',spRouter);
 app.use('/login',loginRouter);
 app.use('/adminPage',adminRouter);
 
-app.listen(8080);
+app.listen(8080, '0.0.0.0', () => {
+});
