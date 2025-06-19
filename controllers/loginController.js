@@ -22,8 +22,32 @@ exports.login = (req,res) => {
         if(!isMatch){
             return res.status(401).send("Contraseña incorrecta");
         }
-        const token = jwt.sign({id : user.id, rol : user.rol},'perro',{expiresIn: '1h'});
-        res.json({token, user : {id : user.id, username : user.username, rol: user.rol},});
+
+        const userData = {
+            id: user.id,
+            username: user.username,
+            rol: user.rol
+        };
+
+
+        if (user.rol === 'Profesor') {
+            const profQuery = 'SELECT id FROM Profesor WHERE nombre = ?';
+            bd.query(profQuery, [user.nombre], (err2, profResult) => {
+                if (err2) return res.status(500).send("Error buscando profesor");
+
+                if (profResult.length === 0) return res.status(403).send("No se encontró el profesor");
+
+                const profesorId = profResult[0].id;
+                userData.profesor_id = profesorId;
+
+                const token = jwt.sign(userData, 'perro', { expiresIn: '1h' });
+
+                return res.json({ token, user: userData });
+            });
+        } else {
+            const token = jwt.sign(userData, 'perro', { expiresIn: '1h' });
+            return res.json({ token, user: userData });
+        }
     })
 
 }

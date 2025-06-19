@@ -113,3 +113,54 @@ exports.obtenerMaterialesClase = (req, res) => {
         res.json({ materiales: result });
     });
 };
+
+exports.generarReporteNotas = (req, res) => {
+    const claseId = req.params.id;
+    const userId = req.user.id; // desde el middleware de autenticación
+    const userRol = req.user.rol;
+    const profesorId = req.user.profesor_id;
+
+
+    // Validar que sea profesor
+    if (userRol !== 'Profesor') {
+        return res.status(403).json({ error: 'No autorizado' });
+    }
+
+    // Validar que el profesor es dueño de la clase
+    const verificarQuery = 'SELECT * FROM ClaseXProfesor WHERE clase_id = ? AND profesor_id = ?';
+    bd.query(verificarQuery, [claseId, profesorId], (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error en la base de datos' });
+        if (result.length === 0) return res.status(403).json({ error: 'No autorizado para esta clase' });
+
+        // Obtener estudiantes, notas 1er y 2do semestre
+        const query = `
+            SELECT
+                e.nombre AS nombre_estudiante,
+                COALESCE(n1.nota, 0) AS nota_primer_semestre,
+                COALESCE(n2.nota, 0) AS nota_segundo_semestre
+            FROM Estudiante e
+                     JOIN Clase c ON e.seccion_id = c.seccion_id
+                     LEFT JOIN Notas n1 ON n1.estudiante_id = e.id AND n1.clase_id = c.id AND n1.semestre_id = 1
+                     LEFT JOIN Notas n2 ON n2.estudiante_id = e.id AND n2.clase_id = c.id AND n2.semestre_id = 2
+            WHERE c.id = ?
+        `;
+
+        bd.query(query, [claseId], (err, rows) => {
+            if (err) return res.status(500).json({ error: 'Error obteniendo notas' });
+
+            // Calcular promedios y estado
+            const reporte = rows.map(est => {
+                const promedio = ((est.nota_primer_semestre || 0) * 0.5) + ((est.nota_segundo_semestre || 0) * 0.5);
+                return {
+                    nombre_estudiante: est.nombre_estudiante,
+                    nota_primer_semestre: est.nota_primer_semestre,
+                    nota_segundo_semestre: est.nota_segundo_semestre,
+                    promedio_final: promedio.toFixed(2),
+                    estado: promedio >= 70 ? 'Aprobado' : 'Reprobado'
+                };
+            });
+
+            res.json({ claseId, reporte });
+        });
+    });
+};
