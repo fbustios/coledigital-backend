@@ -64,12 +64,7 @@ exports.getCourses = (req, res) => {
 }
 };
 
-exports.getStudentId= (req,res) => {
-    const {user_id} = req.body;
-    const query = 'SELECT e.id FROM Usuarios u JOIN Estudiante e ON u.nombre = e.nombre where u.id = ?';
 
-
-}
 
 exports.agregarMaterialProfesor = (req, res) => {
     const { link_one_drive, clase_id, semestre_id, nombre } = req.body;
@@ -164,3 +159,59 @@ exports.generarReporteNotas = (req, res) => {
         });
     });
 };
+
+getFuncionarioID = (usuario_id,rol) => {
+    if(rol === 'Estudiante') {
+
+        const query = `SELECT e.id
+                       FROM Usuarios u
+                                JOIN Estudiante e ON e.nombre = u.nombre
+                       WHERE u.id = ?`;
+        return new Promise((resolve, reject) => {
+            bd.query(query, [usuario_id], (err, result) => {
+                if (err) return reject(0);
+                if (result.length === 1) return resolve(result[0].id);
+                return resolve(0);
+            })
+        })
+    } else {
+        const query = `SELECT e.id
+                       FROM Usuarios u
+                                JOIN Profesor p ON p.nombre = u.nombre
+                       WHERE u.id = ?`;
+        return new Promise((resolve, reject) => {
+            bd.query(query, [usuario_id], (err, result) => {
+                if (err) return reject(0);
+                if (result.length === 1) return resolve(result[0].id);
+                return resolve(0);
+            })
+        })
+    }
+
+}
+
+
+
+exports.getNotas = async (req,res) => {
+    const {id, claseId, semestreId} = req.body;
+    const studentId = await getFuncionarioID(id,'Estudiante');
+    const query = `SELECT ev.nombre, n.nota, ev.porcentaje, n.id 
+        FROM Notas n
+        JOIN Evaluaciones ev ON ev.id = n.evaluacion_id
+        WHERE n.estudiante_id = ? AND n.clase_id = ? AND n.semestre_id = ?;`
+    bd.query(query,[studentId,claseId,semestreId],(err,result) => {
+        if(err) return res.status(500).json({ message: 'Error al obtener notas' });
+        res.json({evaluaciones : result})
+    })
+}
+
+exports.getEstudiantes = () => {
+    const{user_id, claseId} = req.body;
+    const id = getFuncionarioId(user_id,'Profesor')
+    const query = `SELECT e.nombre
+    FROM Clase c 
+    JOIN clasexprofesor cx on cx.clase_id = c.id
+    JOIN Estudiante e on e.seccion_id = c.seccion_id
+    WHERE cx.profesor_id = ? AND c.id = ?`
+    bd.query(query,[])
+}

@@ -8,6 +8,7 @@ Router.post('/Dashboard',auth,spController.getCourses);
 Router.post('/agregarMaterial', auth, spController.agregarMaterialProfesor);
 Router.post('/materialesClase', auth, spController.obtenerMaterialesClase);
 Router.get('/clase/:id/reporte', auth, spController.generarReporteNotas)
+Router.post('/Dashboard/Clase/Notas/NotasPersonales',auth,spController.getNotas);
 
 module.exports = Router;
 
