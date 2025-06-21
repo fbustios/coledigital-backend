@@ -213,5 +213,8 @@ exports.getEstudiantes = () => {
     JOIN clasexprofesor cx on cx.clase_id = c.id
     JOIN Estudiante e on e.seccion_id = c.seccion_id
     WHERE cx.profesor_id = ? AND c.id = ?`
-    bd.query(query,[])
+    bd.query(query,[id,claseId],(err,result) =>{
+        if(err) return res.status(500).json({message: 'Error al obtener estudiantes'})
+        res.json({estudiantes: result})
+    })
 }
