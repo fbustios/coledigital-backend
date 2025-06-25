@@ -199,7 +199,6 @@ exports.getNotas = async (req,res) => {
 
 exports.getEstudiantes = async (req,res) => {
     const{id, claseId} =  req.body;
-    console.log(id + ' ' + claseId)
     try {
         const fid = await getFuncionarioID(id, 'Profesor')
 
@@ -221,5 +220,18 @@ exports.getEstudiantes = async (req,res) => {
     }catch(err){
         return res.status(500).json({message: 'Error al obtener estudiantes'})
     }
+}
 
+exports.editarNota = async (req,res) => {
+    const {notaNueva, notaId} = req.body;
+    const query = `UPDATE Notas 
+            SET nota = ?
+            WHERE id = ?;`
+    bd.query(query,[notaNueva,notaId],(err,result)=>{
+        if(err){
+            console.error(err);
+            return res.status(500).json({ message: 'Error al consultar estudiantes' });
+        }
+        res.json({nada: result})
+    })
 }
