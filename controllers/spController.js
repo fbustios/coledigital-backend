@@ -224,14 +224,15 @@ exports.getEstudiantes = async (req,res) => {
 
 exports.editarNota = async (req,res) => {
     const {notaNueva, notaId} = req.body;
-    const query = `UPDATE Notas 
-            SET nota = ?
-            WHERE id = ?;`
-    bd.query(query,[notaNueva,notaId],(err,result)=>{
-        if(err){
-            console.error(err);
-            return res.status(500).json({ message: 'Error al consultar estudiantes' });
-        }
-        res.json({nada: result})
-    })
+
+        const query = `UPDATE Notas
+                       SET nota = ?
+                       WHERE id = ?;`
+        bd.query(query, [notaNueva, notaId], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({message: 'Error al consultar estudiantes'});
+            }
+            res.json({nada: result})
+        })
 }
