@@ -129,16 +129,13 @@ exports.generarReporteNotas = (req, res) => {
 
         // Obtener estudiantes, notas 1er y 2do semestre
         const query = `
-            SELECT
-                e.nombre AS nombre_estudiante,
-                COALESCE(n1.nota, 0) AS nota_primer_semestre,
-                COALESCE(n2.nota, 0) AS nota_segundo_semestre
-            FROM Estudiante e
-                     JOIN Clase c ON e.seccion_id = c.seccion_id
-                     LEFT JOIN Notas n1 ON n1.estudiante_id = e.id AND n1.clase_id = c.id AND n1.semestre_id = 1
-                     LEFT JOIN Notas n2 ON n2.estudiante_id = e.id AND n2.clase_id = c.id AND n2.semestre_id = 2
-            WHERE c.id = ?
-        `;
+            select e.nombre as nombre_estudiante,  sum(case when n.semestre_id = 1 then (n.nota) * (ev.porcentaje/100) else 0 end) as nota_primer_semestre,
+                   sum(case when n.semestre_id = 2 then (n.nota) * (ev.porcentaje/100) else 0 end) as nota_segundo_semestre
+            from Estudiante e
+                     join notas n on n.estudiante_id = e.id
+                     join evaluaciones ev on ev.id = n.evaluacion_id
+            where n.clase_id = ?
+            group by e.nombre;`;
 
         bd.query(query, [claseId], (err, rows) => {
             if (err) return res.status(500).json({ error: 'Error obteniendo notas' });
