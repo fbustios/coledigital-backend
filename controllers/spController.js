@@ -161,32 +161,24 @@ exports.generarReporteNotas = (req, res) => {
 };
 
 getFuncionarioID = (usuario_id,rol) => {
-    if(rol === 'Estudiante') {
-
-        const query = `SELECT e.id
-                       FROM Usuarios u
-                                JOIN Estudiante e ON e.nombre = u.nombre
-                       WHERE u.id = ?`;
-        return new Promise((resolve, reject) => {
-            bd.query(query, [usuario_id], (err, result) => {
-                if (err) return reject(0);
-                if (result.length === 1) return resolve(result[0].id);
-                return resolve(0);
-            })
-        })
-    } else {
-        const query = `SELECT e.id
-                       FROM Usuarios u
-                                JOIN Profesor p ON p.nombre = u.nombre
-                       WHERE u.id = ?`;
-        return new Promise((resolve, reject) => {
-            bd.query(query, [usuario_id], (err, result) => {
-                if (err) return reject(0);
-                if (result.length === 1) return resolve(result[0].id);
-                return resolve(0);
-            })
-        })
+    let query = `SELECT e.id
+                FROM Usuarios u
+                JOIN Estudiante e ON e.nombre = u.nombre
+                WHERE u.id = ?`;
+    if(rol === 'Profesor') {
+        query = `SELECT p.id
+            FROM Usuarios u
+            JOIN Profesor p ON p.nombre = u.nombre
+            WHERE u.id = ?`;
     }
+
+    return new Promise((resolve, reject) => {
+        bd.query(query, [usuario_id], (err, result) => {
+            if (err) return reject(0)
+            if (result.length === 1) return resolve(result[0].id);
+            return resolve(0);
+        })
+    })
 
 }
 
@@ -205,16 +197,29 @@ exports.getNotas = async (req,res) => {
     })
 }
 
-exports.getEstudiantes = () => {
-    const{user_id, claseId} = req.body;
-    const id = getFuncionarioId(user_id,'Profesor')
-    const query = `SELECT e.nombre
-    FROM Clase c 
-    JOIN clasexprofesor cx on cx.clase_id = c.id
-    JOIN Estudiante e on e.seccion_id = c.seccion_id
-    WHERE cx.profesor_id = ? AND c.id = ?`
-    bd.query(query,[id,claseId],(err,result) =>{
-        if(err) return res.status(500).json({message: 'Error al obtener estudiantes'})
-        res.json({estudiantes: result})
-    })
+exports.getEstudiantes = async (req,res) => {
+    const{id, claseId} =  req.body;
+    console.log(id + ' ' + claseId)
+    try {
+        const fid = await getFuncionarioID(id, 'Profesor')
+
+        const query = `SELECT e.nombre, u.id
+                FROM Clase c
+                    JOIN clasexprofesor cx on cx.clase_id = c.id
+                    JOIN Estudiante e on e.seccion_id = c.seccion_id
+                    JOIN Usuarios u on u.nombre = e.nombre
+                    WHERE cx.profesor_id = ? AND c.id = ?;`
+
+        bd.query(query, [fid, claseId], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Error al consultar estudiantes' });
+            }
+            res.json({ estudiantes: result });
+
+        });
+    }catch(err){
+        return res.status(500).json({message: 'Error al obtener estudiantes'})
+    }
+
 }
